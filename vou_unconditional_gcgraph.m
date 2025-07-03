@@ -1,8 +1,8 @@
-function F = vou_conditional_gcgraph(A,V)
+function F = vou_unconditional_gcgraph(A,V)
 
 % DESCRIPTION:
 %
-% Calculate time-domain conditional Granger-causal graph for a vector
+% Calculate time-domain unconditional Granger-causal graph for a vector
 % Ornstein-Uhlenbeck (VOU) process X(t):
 %
 %	dX(t) = AX(t)dt + dW(t)
@@ -18,7 +18,7 @@ function F = vou_conditional_gcgraph(A,V)
 %
 % RETURN VALUE:
 %
-% F     - pairwise-conditional Granger causality rates (conditional Granger-causal graph)
+% F     - pairwise-unconditional Granger causality rates (unconditional Granger-causal graph)
 %
 % REFERENCES:
 %
@@ -32,7 +32,9 @@ function F = vou_conditional_gcgraph(A,V)
 [n1,n2]  = size(V); assert(n1 == n2,'VOU covariance matrix must be square');
                     assert(n1 == n, 'VOU covariance matrix must be same size as coefficients matrix');
 
-F = nan(n);
+% First we calculate the conditional GC rates F(y -> x | [xy])
+
+F1 = nan(n);
 for y = 1:n
     r = [1:y-1 y+1:n]; % omit y
 
@@ -49,5 +51,9 @@ for y = 1:n
 	c = VOL*VOL'-V(y,y);
 	P = (sqrt(b^2-a*c)-b)/a;
 
-	F(r,y) = (A(r,y).^2).*(P./diag(V(r,r)));
+	F1(r,y) = (A(r,y).^2).*(P./diag(V(r,r)));
 end
+
+% Now we calculate the unconditional GC rates F([x] -> x)
+
+%%% TODO %%%

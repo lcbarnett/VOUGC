@@ -1,8 +1,8 @@
-function [F,err] = vou_conditional_gc(A,V,x,y)
+function [F,err1,err2] = vou_unconditional_gc(A,V,x,y)
 
 % DESCRIPTION:
 %
-% Calculate time-domain conditional Granger causality rate for a vector
+% Calculate time-domain unconditional Granger causality rate for a vector
 % Ornstein-Uhlenbeck (VOU) process X(t):
 %
 %	dX(t) = AX(t)dt + dW(t)
@@ -11,16 +11,15 @@ function [F,err] = vou_conditional_gc(A,V,x,y)
 % NOTE: A need not be stable (i.e., may have eigenvalues with nonnegative real
 % part).
 %
-% Source/target/conditioning variables may be multivariate. Uses a state-space
-% method which involves solving an associated continuous-time algebraic Riccati
-% equation (CARE).
+% Source/target variables may be multivariate. Uses a state-space method which
+% involves solving an associated continuous-time algebraic Riccati equation (CARE).
 %
 % PARAMETERS:
 %
 % A     - VOU coefficients matrix
 % V     - VOU Wiener process covariance matrix
 % x     - multi-index of target variable
-% y     - multi-index of source variable (NOTE: conditioning is on all remaining variables)
+% y     - multi-index of source variable
 %
 % RETURN VALUES:
 %
@@ -57,12 +56,10 @@ assert(isempty(intersect(x,y)), 'Source/target multi-indices overlap');
 z = 1:n; z([x y]) = []; % indices of remaining (conditioning) variables
 r = [x z];              % indices for the reduced system
 
-err = 0;
+err1 = 0;
+err2 = 0;
 
-if all(A(x,y) == 0)
-	F = 0;
-	return
-end
+% First we calculate the conditional GC rate F(y -> x | z)
 
 if length(y) == 1 % P scalar, so CARE is a quadratic equation.
 
@@ -73,16 +70,32 @@ if length(y) == 1 % P scalar, so CARE is a quadratic equation.
 	b = AOL*VOL'-A(y,y);
 	c = VOL*VOL'-V(y,y);
 	P = (sqrt(b^2-a*c)-b)/a;
-	F = P*trace(V(x,x)\(A(x,y)*A(x,y)'));
+	F1 = P*trace(V(x,x)\(A(x,y)*A(x,y)'));
 
 else
 
 	[P,~,~,rep] = icare(A(y,y)',A(r,y)',V(y,y),V(r,r),V(r,y)');
-	err = rep.Report;
+	err1 = rep.Report;
 	if err ~= 0
 		F = NaN;
 		return
 	end
-	F = trace(V(x,x)\(A(x,y)*P*A(x,y)'));
+	F1 = trace(V(x,x)\(A(x,y)*P*A(x,y)'));
 
 end
+
+% Now we calculate the unconditional GC rate F(yz -> x)
+
+o = [z y]; % indices for the "other" system
+
+[P,~,~,rep] = icare(A(o,o)',A(x,o)',V(o,o),V(x,x),V(x,o)');
+err2 = rep.Report;
+if err ~= 0
+	F = NaN;
+	return
+end
+F1 = trace(V(x,x)\(A(x,o)*P*A(x,o)'));
+
+% F = F(yz -> x) - F(y -> x | z)
+
+F = f2 - F1;
