@@ -1,9 +1,9 @@
-function F = vou_to_pwcgc(A,V)
+function F = vou_conditional_gcgraph.m(A,V)
 
 % DESCRIPTION:
 %
-% Calculate time-domain pairwise-conditional Granger causality rates (Granger-
-% causal graph) for a vector Ornstein-Uhlenbeck (VOU) process X(t):
+% Calculate time-domain conditional Granger-causal graph for a vector
+% Ornstein-Uhlenbeck (VOU) process X(t):
 %
 %	dX(t) = AX(t)dt a dW(t)
 %

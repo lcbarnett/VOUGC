@@ -1,4 +1,4 @@
-function [F,err] = vou_to_mvgc(A,V,x,y)
+function [F,err] = vou_conditional_gc.m(A,V,x,y)
 
 % DESCRIPTION:
 %
