@@ -42,60 +42,24 @@ function [F,err1,err2] = vou_unconditional_gc(A,V,x,y)
 %
 % (C) Lionel Barnett, 2024
 
-[n, n1]  = size(A); assert(n1 == n, 'VOU coefficients matrix must be square');
-[n1,n2]  = size(V); assert(n1 == n2,'VOU covariance matrix must be square');
-                    assert(n1 == n, 'VOU covariance matrix must be same size as coefficients matrix');
-
+n = size(A,1);
 x = x(:)'; % vectorise
 y = y(:)'; % vectorise
-
-assert(all(x >=1 & x <= n),     'Some target indices out of range');
-assert(all(y >=1 & y <= n),     'Some source indices out of range');
-assert(isempty(intersect(x,y)), 'Source/target multi-indices overlap');
-
 z = 1:n; z([x y]) = []; % indices of remaining (conditioning) variables
-r = [x z];              % indices for the reduced system
 
 err1 = 0;
 err2 = 0;
 
-% First we calculate the conditional GC rate F(y -> x | z)
-
-if length(y) == 1 % P scalar, so CARE is a quadratic equation.
-
-	L = chol(V(r,r));
-	AOL = A(r,y)'/L;
-	VOL = V(y,r)/L;
-	a = AOL*AOL';
-	b = AOL*VOL'-A(y,y);
-	c = VOL*VOL'-V(y,y);
-	P = (sqrt(b^2-a*c)-b)/a;
-	F1 = P*trace(V(x,x)\(A(x,y)*A(x,y)'));
-
-else
-
-	[P,~,~,rep] = icare(A(y,y)',A(r,y)',V(y,y),V(r,r),V(r,y)');
-	err1 = rep.Report;
-	if err ~= 0
-		F = NaN;
-		return
-	end
-	F1 = trace(V(x,x)\(A(x,y)*P*A(x,y)'));
-
-end
-
-% Now we calculate the unconditional GC rate F(yz -> x)
-
-o = [z y]; % indices for the "other" system
-
-[P,~,~,rep] = icare(A(o,o)',A(x,o)',V(o,o),V(x,x),V(x,o)');
-err2 = rep.Report;
-if err ~= 0
+[F1,err1] = vou_conditional_gc(A,V,x,z); % F(z -> x | y)
+if err1 ~= 0
 	F = NaN;
 	return
 end
-F1 = trace(V(x,x)\(A(x,o)*P*A(x,o)'));
 
-% F = F(yz -> x) - F(y -> x | z)
+[F2,err2] = vou_conditional_gc(A,V,x,[y z]); % F(yz -> x) - actually unconditional
+if err2 ~= 0
+	F = NaN;
+	return
+end
 
-F = f2 - F1;
+F = F2 - F1; % F = F(yz -> x) - F(z -> x | y) - Geweke identity

@@ -70,7 +70,6 @@ end
 
 if vident
 	if length(y) == 1 % P scalar, so CARE is a quadratic equation.
-
 		a = A(r,y)'*A(r,y);
 		b = -A(y,y);
 		P = (sqrt(b^2+a)-b)/a;

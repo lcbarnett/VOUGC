@@ -1,4 +1,4 @@
-function F = vou_unconditional_gcgraph(A,V)
+function [F,err1,err2] = vou_unconditional_gcgraph(A,V)
 
 % DESCRIPTION:
 %
@@ -28,32 +28,27 @@ function F = vou_unconditional_gcgraph(A,V)
 %
 % (C) Lionel Barnett, 2024
 
-[n, n1]  = size(A); assert(n1 == n, 'VOU coefficients matrix must be square');
-[n1,n2]  = size(V); assert(n1 == n2,'VOU covariance matrix must be square');
-                    assert(n1 == n, 'VOU covariance matrix must be same size as coefficients matrix');
+n = size(A,1);
 
-% First we calculate the conditional GC rates F(y -> x | [xy])
+err1 = 0;
+err2 = 0;
 
-F1 = nan(n);
-for y = 1:n
-    r = [1:y-1 y+1:n]; % omit y
-
-	if all(A(r,y) == 0)
-		F(r,y) = 0;
-		continue
+F = nan(n);
+for i = 1:n
+	oi = 1:n; oi(i) = []; % omit i
+	[F1,err1] = vou_conditional_gc(A,V,i,oi); % F([i] -> i) - actually unconditional
+	if err1 ~= 0
+		F = NaN;
+		return
 	end
-
-	L = chol(V(r,r));
-	AOL = A(r,y)'/L;
-	VOL = V(y,r)/L;
-	a = AOL*AOL';
-	b = AOL*VOL'-A(y,y);
-	c = VOL*VOL'-V(y,y);
-	P = (sqrt(b^2-a*c)-b)/a;
-
-	F1(r,y) = (A(r,y).^2).*(P./diag(V(r,r)));
+	for j = 1:n
+		if j == i, continue; end
+		oij = 1:n; oij([i j]) = []; % omit i,j
+		[F2,err2] = vou_conditional_gc(A,V,i,oij); % F([ij] -> i | j)
+		if err2 ~= 0
+			F = NaN;
+			return
+		end
+		F(i,j) = F1 - F2; % F(i,j) = F([i] -> i) - F([ij] -> i | j) - Geweke identity
+	end
 end
-
-% Now we calculate the unconditional GC rates F([x] -> x)
-
-%%% TODO %%%
