@@ -18,7 +18,7 @@ function [F,err] = vou_conditional_gc(A,V,x,y)
 % PARAMETERS:
 %
 % A     - VOU coefficients matrix
-% V     - VOU Wiener process covariance matrix
+% V     - VOU Wiener process covariance matrix (or empty for identity matrix)
 % x     - multi-index of target variable
 % y     - multi-index of source variable (NOTE: conditioning is on all remaining variables)
 %
@@ -43,9 +43,13 @@ function [F,err] = vou_conditional_gc(A,V,x,y)
 %
 % (C) Lionel Barnett, 2024
 
-[n, n1]  = size(A); assert(n1 == n, 'VOU coefficients matrix must be square');
-[n1,n2]  = size(V); assert(n1 == n2,'VOU covariance matrix must be square');
-                    assert(n1 == n, 'VOU covariance matrix must be same size as coefficients matrix');
+[n,n1] = size(A); assert(n1 == n, 'VOU coefficients matrix must be square');
+vident = isempty(V) || isequal(V,eye(n));
+if ~vident
+	[n1,n2] = size(V);
+	assert(n1 == n2,'VOU covariance matrix must be square');
+	assert(n1 == n, 'VOU covariance matrix must be same size as coefficients matrix');
+end
 
 x = x(:)'; % vectorise
 y = y(:)'; % vectorise
@@ -64,25 +68,40 @@ if all(A(x,y) == 0)
 	return
 end
 
-if length(y) == 1 % P scalar, so CARE is a quadratic equation.
+if vident
+	if length(y) == 1 % P scalar, so CARE is a quadratic equation.
 
-	L = chol(V(r,r));
-	AOL = A(r,y)'/L;
-	VOL = V(y,r)/L;
-	a = AOL*AOL';
-	b = AOL*VOL'-A(y,y);
-	c = VOL*VOL'-V(y,y);
-	P = (sqrt(b^2-a*c)-b)/a;
-	F = P*trace(V(x,x)\(A(x,y)*A(x,y)'));
-
-else
-
-	[P,~,~,rep] = icare(A(y,y)',A(r,y)',V(y,y),V(r,r),V(r,y)');
-	err = rep.Report;
-	if err ~= 0
-		F = NaN;
-		return
+		AOL = A(r,y)';
+		a = A(r,y)'*A(r,y);
+		b = -A(y,y);
+		P = (sqrt(b^2+a)-b)/a;
+		F = P*sum(A(x,y).^2);
+	else
+		[P,~,~,rep] = icare(A(y,y)',A(r,y)',eye(length(y))); % R and S matrices default to I and 0 respectively
+		err = rep.Report;
+		if err ~= 0
+			F = NaN;
+			return
+		end
+		F = trace(A(x,y)*P*A(x,y)');
 	end
-	F = trace(V(x,x)\(A(x,y)*P*A(x,y)'));
-
+else
+	if length(y) == 1 % P scalar, so CARE is a quadratic equation.
+		L = chol(V(r,r));
+		AOL = A(r,y)'/L;
+		VOL = V(y,r)/L;
+		a = AOL*AOL';
+		b = AOL*VOL'-A(y,y);
+		c = VOL*VOL'-V(y,y);
+		P = (sqrt(b^2-a*c)-b)/a;
+		F = P*trace(V(x,x)\(A(x,y)*A(x,y)'));
+	else
+		[P,~,~,rep] = icare(A(y,y)',A(r,y)',V(y,y),V(r,r),V(r,y)');
+		err = rep.Report;
+		if err ~= 0
+			F = NaN;
+			return
+		end
+		F = trace(V(x,x)\(A(x,y)*P*A(x,y)'));
+	end
 end
