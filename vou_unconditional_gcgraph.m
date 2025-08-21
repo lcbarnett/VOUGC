@@ -14,7 +14,7 @@ function [F,err1,err2] = vou_unconditional_gcgraph(A,V)
 % PARAMETERS:
 %
 % A     - VOU coefficients matrix
-% V     - VOU Wiener process covariance matrix
+% V     - VOU Wiener process covariance matrix (or empty for identity matrix)
 %
 % RETURN VALUE:
 %
@@ -27,6 +27,10 @@ function [F,err1,err2] = vou_unconditional_gcgraph(A,V)
 % (3) L. Barnett (2017): Granger causality rate for a vector Ornstein-Uhlenbeck process (working notes).
 %
 % (C) Lionel Barnett, 2024
+
+if nargin < 2
+	V = [];
+end
 
 n = size(A,1);
 

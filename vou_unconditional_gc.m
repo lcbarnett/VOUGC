@@ -17,7 +17,7 @@ function [F,err1,err2] = vou_unconditional_gc(A,V,x,y)
 % PARAMETERS:
 %
 % A     - VOU coefficients matrix
-% V     - VOU Wiener process covariance matrix
+% V     - VOU Wiener process covariance matrix (or empty for identity matrix)
 % x     - multi-index of target variable
 % y     - multi-index of source variable
 %
