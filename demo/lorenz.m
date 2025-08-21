@@ -8,7 +8,7 @@ function [t,y] = lorenz(T,y0,p,dt)
 %
 % T      - maximum time (integrates from t = 0 to t = T)
 % y0     - initial values (3-vector)
-% p      - Lorenz parameters (3-vector, containing sigma, rho and beta parameters - see (1))
+% p      - Lorenz system parameters (3-vector, containing sigma, rho and beta parameters - see (1))
 % dt     - sampling interval of returned values (may not be same as integration step size!)
 %
 % RETURN VALUE:

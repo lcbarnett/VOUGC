@@ -7,7 +7,7 @@ function J = lorenz_jacobian(y,p)
 % PARAMETERS:
 %
 % y  - Lorenz variable values - point in phase space (3-vector)
-% p  - Lorenz parameters (3-vector, containing sigma, rho and beta parameters - see (1))
+% p  - Lorenz syatem parameters (3-vector, containing sigma, rho and beta parameters - see (1))
 %
 % RETURN VALUE:
 %
