@@ -6,15 +6,15 @@ function [t,y] = lorenz(T,y0,parms,dt)
 %
 % PARAMETERS:
 %
-% T      - maximum time (integrates from tt = 0 to tt = T
+% T      - maximum time (integrates from t = 0 to t = T)
 % y0     - initial values (3-vector)
 % parms  - Lorenz parameters (3-vector, containing sigma, rho and beta parameters - see (1))
-% dt     - sampling interval
+% dt     - sampling interval of returned values (may not be same as integration step size!)
 %
 % RETURN VALUE:
 %
-% t     - sample time values
-% y     - variable values
+% t      - sample time values
+% y      - Lorenz variable values
 %
 % REFERENCES:
 %
@@ -22,8 +22,11 @@ function [t,y] = lorenz(T,y0,parms,dt)
 %
 % (C) Lionel Barnett, 2025
 
-% parms = [10.00, 28.00, 8.0/3.0]; - reasonable default parms
-% y0 =  = [1,1,1];                 - reasonable default initial values
+% some nice defaults:
+
+if nargin < 2 || isempty(y0),    y0    = [1; 1; 1];               end
+if nargin < 3 || isempty(parms), parms = [10.00; 28.00; 8.0/3.0]; end
+if nargin < 4 || isempty(dt),    dt    = 0.01;                    end
 
 s = parms(1); % sigma
 r = parms(2); % rho
