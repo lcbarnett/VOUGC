@@ -14,7 +14,7 @@ fprintf('[VOUGC startup] Initialising VOUGC toolbox.\n');
 global vougc_root
 vougc_root = fileparts(mfilename('fullpath')); % directory containing this file
 addpath(vougc_root);
-addpath(fullfile(vougc_root,'utils'));
+addpath(fullfile(vougc_root,'demo'));
 
 % Check if we have the icare function from the Control System Toolbox.
 
