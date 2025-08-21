@@ -13,7 +13,7 @@ This code implements computation of the _zero-horizon Granger causality rate_ fo
 
 There is a script [lorenz_demo.m](https://github.com/lcbarnett/VOUGC/blob/main/demo/lorenz_demo.m) in the [demo](https://github.com/lcbarnett/VOUGC/tree/main/demo) directory, demonstrating application of the Granger causality maps technique to the classical [Lorenz chaotic system](https://en.wikipedia.org/wiki/Lorenz_system). It makes pretty pictures like this:
 
-![Granger causality maps for the Lorenz chaotic system](lorenz_GC_maps.png).
+![Granger causality maps for the Lorenz chaotic system](demo/lorenz_GC_maps.png).
 
 ### Developer and maintainer
 [Lionel Barnett](https://users.sussex.ac.uk/~lionelb/) ([lionelb@sussex.ac.uk](mailto:lionelb@sussex.ac.uk)), Department of Informatics, University of Sussex, UK.
