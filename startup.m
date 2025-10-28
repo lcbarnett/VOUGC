@@ -9,12 +9,27 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-fprintf('[VOUGC startup] Initialising VOUGC toolbox.\n');
+% Skip initialisation if already initialised (unless vougc_forceinit is set)
+
+global vougc_initialised
+if vougc_initialised
+	if exist('vougc_forceinit') && vougc_forceinit
+		fprintf('[VOUGC startup] Already initialised - forcing re-initialisation\n');
+		vougc_initialised = false;
+		clear vougc_forceinit
+	else
+		fprintf('[VOUGC startup] Already initialised - skipping\n');
+		return
+	end
+else
+	fprintf('[VOUGC startup] Initialising\n');
+end
 
 global vougc_root
 vougc_root = fileparts(mfilename('fullpath')); % directory containing this file
 addpath(vougc_root);
 addpath(fullfile(vougc_root,'demo'));
+fprintf('[VOUGC startup] Added appropriate paths\n');
 
 % Check if we have the icare function from the Control System Toolbox.
 
@@ -25,4 +40,5 @@ if exist('icare') ~= 2
 	fprintf(2,'[VOUGC startup]\n');
 end
 
-fprintf('[VOUGC startup] Initialisation complete (you may re-run ''startup'' at any time).\n');
+vougc_initialised = true;
+fprintf('[VOUGC startup] Initialisation complete (you may re-run ''startup'' at any time)\n');
