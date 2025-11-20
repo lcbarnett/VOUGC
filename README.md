@@ -1,7 +1,7 @@
 # VOUGC
-A small [Matlab](https://www.mathworks.com/products/matlab.html)&trade; toolbox<sup>*</sup> for calculating [Granger causality](https://en.wikipedia.org/wiki/Granger_causality), conditional and unconditional, for vector [Ornstein-Uhlenbeck (VOU) processes](https://en.wikipedia.org/wiki/Ornstein%E2%80%93Uhlenbeck_process).
+A small [Matlab](https://www.mathworks.com/products/matlab.html)&trade; toolbox<sup>*</sup> for calculating [Granger causality](https://en.wikipedia.org/wiki/Granger_causality) rates, conditional and unconditional, for vector [Ornstein-Uhlenbeck (VOU) processes](https://en.wikipedia.org/wiki/Ornstein%E2%80%93Uhlenbeck_process).
 
-<sup>*NOTE: some functionality requires the [Matlab Control System Toolbox](https://www.mathworks.com/products/control.html), in particular the [icare](https://www.mathworks.com/help/control/ref/icare.html) function for solving continuous-time algebraic Riccati equations (CAREs).</sup>
+<sup>*NOTE: some functionality requires the [Matlab Control System Toolbox](https://www.mathworks.com/products/control.html), specifically the [icare](https://www.mathworks.com/help/control/ref/icare.html) function for solving continuous-time algebraic Riccati equations (CAREs).</sup>
 
 A VOU process is a continuous-time multivariate linear autoregressive process expressed as a stochastic differential equation ([SDE](https://en.wikipedia.org/wiki/Stochastic_differential_equation)) of the form:
 
